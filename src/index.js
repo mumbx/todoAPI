@@ -1,8 +1,9 @@
 const express = require('express')
 const app = express()
-const {getUsers, postUsers, getUsersByEmail, deleteUserByEmail} = require('./controllers/users-controller')
-const {getTasks, postTasks, getTasksById, deleteTaskById} = require('./controllers/tasks-controller')
-const bd = require('./infra/bd')
+const bd = require('./infra/sqlite-db')
+const {getUsers, postUsers, getUsersByEmail, deleteUserByEmail, updateUser} = require('./controllers/users-controller')
+const {getTasks, postTasks, getTasksById, deleteTaskById, updateTask} = require('./controllers/tasks-controller')
+
 
 //Models
 const User = require('./models/userModel')
@@ -12,19 +13,23 @@ const Task = require('./models/taskModel')
 app.use(express.json())
 
 //Users Routes
-getUsers(app, User, bd)
-getTasks(app, User, bd)
+getUsers(app, bd)
+postUsers(app, User, bd)
 getUsersByEmail(app, bd)
 deleteUserByEmail(app, bd) 
+updateUser(app, bd)
 
 //Tasks Routes
-postUsers(app, User, bd)
+getTasks(app, bd)
 postTasks(app, Task, bd)
 getTasksById(app, bd) 
 deleteTaskById(app, bd)
+updateTask(app, bd)
+
 
 app.listen(3000, ()=>{
     console.log("Servidor rodando na porta: 3000")
+
 })
 
 

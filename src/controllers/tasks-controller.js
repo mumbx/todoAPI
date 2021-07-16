@@ -1,4 +1,4 @@
-const getTasks = (app, users, bd) => { app.get('/tasks', function (req, res) {
+const getTasks = (app, bd) => { app.get('/tasks', function (req, res) {
     res.json(
       {
         tasks:bd.Tasks,
@@ -24,9 +24,7 @@ const getTasks = (app, users, bd) => { app.get('/tasks', function (req, res) {
     bd.Tasks = bd.Tasks.filter(tasks => req.params.id != tasks.id)
 
     res.json(
-      {message:"Task deleted",
-       users:bd.Tasks
-  })
+      {message:"Task deleted"})
 
   }) }
 
@@ -45,9 +43,45 @@ const postTasks = (app, Task, bd) => { app.post('/tasks', function (req, res) {
 
 })}
 
+const updateTask = (app, bd) => { app.put('/tasks/:id', function (req, res) {
+
+  let {title, description, status} = req.body
+
+  let changes = 0;
+
+  bd.Tasks = bd.Tasks.map( task => {
+
+      if(req.params.id == task.id){
+
+        if(title != null && title != undefined)
+        task.title = title
+
+        if(description != null && description != undefined)
+        task.description = description
+
+        if(status != null && status != undefined)
+        task.status = status
+
+        ++changes
+
+      }               
+
+      return task
+
+  })   
+
+  if(changes){
+    res.json({"Task updated": `${changes}`})
+  }else{
+    res.json({"Error":"Task not found"})
+  }
+
+}) }
+
   module.exports = {
     getTasks,
     postTasks,
     getTasksById,
-    deleteTaskById
+    deleteTaskById,
+    updateTask
   }
