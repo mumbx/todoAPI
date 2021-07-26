@@ -4,6 +4,7 @@ const bd = require('./infra/sqlite-db')
 const UserRoutes = require('./controllers/users-controller')
 const TasksRoutes = require('./controllers/tasks-controller')
 const cors = require('cors')
+const porta = process.env.PORT
 
 
 //Models
@@ -21,8 +22,8 @@ UserRoutes(app, bd)
 TasksRoutes(app, bd)
 
 
-app.listen(3000, ()=>{
-    console.log("Servidor rodando na porta: 3000")
+app.listen(porta, ()=>{
+    console.log(`Servidor rodando na porta: ${porta}`)
 
 })
 
