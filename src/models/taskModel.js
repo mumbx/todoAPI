@@ -1,12 +1,11 @@
-var idTask = 0;
+const moment = require('moment')
 
 class Task{
 
-    constructor(title, description, status)
+    constructor(title, description, status, userId)
     {      
 
-        if(title.length >= 4 && typeof title == "string"){
-            this.id = ++idTask;
+        if(title.length >= 4 && typeof title == "string"){           
             this.title = title;
         }else{
             throw new Error('Title must have more than 4 characters')
@@ -23,9 +22,10 @@ class Task{
         }else{
             throw new Error('Status must have more than 5 characters')
         }      
- 
+        
+        this.userId = userId
 
-        this.created = new Date();
+        this.created = moment()
     }
 }
 

@@ -1,85 +1,73 @@
- 
-  const getUsers = (app, bd) => { app.get('/users', function (req, res) {
+ const User = require('../models/userModel')
+ const UserContext = require('../Context/UserContext')
 
-    bd.all('select * from usuarios', (err, rows)=>{
-      
-      if(err){
-        res.json({Error:err})
-      }else{
-        res.json({result:rows})
+  module.exports = (app, bd)=>{
+
+    let userContext = new UserContext(bd)
+
+    app.get('/users', async (req, res)=>{ 
+
+      try{
+        let rows = await userContext.getAllUsers()
+        res.json({Results:rows})
       }
+      catch(e){
+        res.json({error:e.message})
+      }      
 
     })
+  
+    app.get('/users/:id', async (req, res)=>{
+      
+      try{
+        let rows = await userContext.getUserByid(req.params.id)
+        res.json({Results:rows})
+      }
+      catch(e){
+        res.json({error:'User not found or invalid parameters'})
+      }  
+      
+  
+    })
+  
+    app.delete('/users/:id', async (req, res)=>{
+      
+      try{
+        let action = await userContext.deleteUser(req.params.id)
+        res.json({Action:action})
+      }catch(e){
+        res.json({error:'User not deleted or invalids parameters'})
+      }
+     
+  
+    }) 
+  
+   app.post('/users', async (req, res)=>{
 
-  }) }
-
-  const getUsersByEmail = (app, bd) => { app.get('/users/:email', function (req, res) {
-
-    let filter = bd.Users.filter(users => req.params.email == users.email)
-
-    if(filter.length){
-      res.send(filter)
-    }else{
-      res.json({"message":"user not found"})
-    }
-
-  }) }
-
-  const deleteUserByEmail = (app, bd) => { app.delete('/users/:email', function (req, res) {
-
-    bd.Users = bd.Users.filter(users => req.params.email != users.email)
-
-    res.json({"message":"user deleted"})
-
-  }) }
-
-  const postUsers = (app, User, bd) => { app.post('/users', function (req, res) {
+      try{
+        const user = new User(req.body.name, req.body.email, req.body.password)  
+        const values = [user.name, user.email, user.password]
+        let created = await userContext.createUser(values, user)
+        res.json(created)
+        
+      }catch(e){
+        res.json({error:e.message})
+      }     
+      
+    })
     
-    const Usuario = new User(req.body.name, req.body.email, req.body.password)
-    bd.Users.push(Usuario)
-    res.send('Usuario Criado')
+    app.put('/users/:id', async (req, res)=>{
+
+      let id = req.params.id
+      let {name, email, password} = req.body
+
+      try{        
+        let update = await userContext.updateUser(name, email, password, id)
+        res.json(update)
+      }catch(e){
+        res.json({error:e.message})
+      }    
+
+    }) 
   
-  }) }
-  
-  const updateUser = (app, bd) => { app.put('/users/:email', function (req, res) {
-
-    let {name, email, password} = req.body
-
-    let changes = 0;
-
-    bd.Users = bd.Users.map( user => {
-
-        if(req.params.email == user.email){
-
-          if(email != null && email != undefined)
-          user.email = email
-
-          if(name != null && name != undefined)
-          user.name = name
-  
-          if(password != null && password != undefined)
-          user.password = password
-
-          ++changes
-
-        }               
-
-        return user
-
-    })   
-
-    if(changes){
-      res.json({"Users updateds": `${changes}`})
-    }else{
-      res.json({"Error":"User not found"})
-    }
-  
-  }) }
-
-  module.exports = {
-    getUsers,
-    postUsers,
-    getUsersByEmail,
-    deleteUserByEmail,
-    updateUser 
   }

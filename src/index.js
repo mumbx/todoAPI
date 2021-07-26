@@ -1,8 +1,9 @@
 const express = require('express')
 const app = express()
 const bd = require('./infra/sqlite-db')
-const {getUsers, postUsers, getUsersByEmail, deleteUserByEmail, updateUser} = require('./controllers/users-controller')
-const {getTasks, postTasks, getTasksById, deleteTaskById, updateTask} = require('./controllers/tasks-controller')
+const UserRoutes = require('./controllers/users-controller')
+const TasksRoutes = require('./controllers/tasks-controller')
+const cors = require('cors')
 
 
 //Models
@@ -11,20 +12,13 @@ const Task = require('./models/taskModel')
 
 //MiddleWares
 app.use(express.json())
+app.use(cors())
 
 //Users Routes
-getUsers(app, bd)
-postUsers(app, User, bd)
-getUsersByEmail(app, bd)
-deleteUserByEmail(app, bd) 
-updateUser(app, bd)
+UserRoutes(app, bd)
 
 //Tasks Routes
-getTasks(app, bd)
-postTasks(app, Task, bd)
-getTasksById(app, bd) 
-deleteTaskById(app, bd)
-updateTask(app, bd)
+TasksRoutes(app, bd)
 
 
 app.listen(3000, ()=>{
